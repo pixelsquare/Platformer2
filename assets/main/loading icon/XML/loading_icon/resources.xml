@@ -1,0 +1,67 @@
+<resources md5="850648bdae502eb63a4033af907b01e6">
+  <movie name="loading_icon/loading" frameRate="30">
+    <layer name="loading_orb_4">
+      <kf duration="9" ref="loading_icon/loading_orb" loc="0,15" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="15,0" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="10" ref="loading_icon/loading_orb" loc="15,0" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="0,-15" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="9" ref="loading_icon/loading_orb" loc="0,-15" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="-15,0" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="10" ref="loading_icon/loading_orb" loc="-15,0" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="0,15" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="1" ref="loading_icon/loading_orb" loc="0,15" pivot="1.4,1.4" tweened="false"/>
+    </layer>
+    <layer name="loading_orb_3">
+      <kf duration="9" ref="loading_icon/loading_orb" loc="-15,0" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="0,15" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="10" ref="loading_icon/loading_orb" loc="0,15" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="15,0" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="9" ref="loading_icon/loading_orb" loc="15,0" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="0,-15" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="10" ref="loading_icon/loading_orb" loc="0,-15" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="-15,0" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="1" ref="loading_icon/loading_orb" loc="-15,0" pivot="1.4,1.4" tweened="false"/>
+    </layer>
+    <layer name="loading_orb_2">
+      <kf duration="9" ref="loading_icon/loading_orb" loc="0,-15" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="-15,0" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="10" ref="loading_icon/loading_orb" loc="-15,0" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="0,15" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="9" ref="loading_icon/loading_orb" loc="0,15" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="15,0" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="10" ref="loading_icon/loading_orb" loc="15,0" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="0,-15" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="1" ref="loading_icon/loading_orb" loc="0,-15" pivot="1.4,1.4" tweened="false"/>
+    </layer>
+    <layer name="loading_orb_1">
+      <kf duration="9" ref="loading_icon/loading_orb" loc="15,0" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="0,-15" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="10" ref="loading_icon/loading_orb" loc="0,-15" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="-15,0" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="9" ref="loading_icon/loading_orb" loc="-15,0" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="0,15" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="10" ref="loading_icon/loading_orb" loc="0,15" pivot="1.4,1.4"/>
+      <kf duration="5" ref="loading_icon/loading_orb" loc="15,0" pivot="1.4,1.4" tweened="false"/>
+      <kf duration="1" ref="loading_icon/loading_orb" loc="15,0" pivot="1.4,1.4" tweened="false"/>
+    </layer>
+    <layer name="loading_center">
+      <kf duration="9" ref="loading_icon/square_center" pivot="10.6,10.6"/>
+      <kf duration="5" ref="loading_icon/square_center" scale="0.15,0.15" pivot="10.6,10.6" tweened="false"/>
+      <kf duration="10" ref="loading_icon/square_center" scale="0.15,0.15" pivot="10.6,10.6"/>
+      <kf duration="5" ref="loading_icon/square_center" pivot="10.6,10.6" tweened="false"/>
+      <kf duration="9" ref="loading_icon/square_center" pivot="10.6,10.6"/>
+      <kf duration="5" ref="loading_icon/square_center" scale="0.15,0.15" pivot="10.6,10.6" tweened="false"/>
+      <kf duration="10" ref="loading_icon/square_center" scale="0.15,0.15" pivot="10.6,10.6"/>
+      <kf duration="5" ref="loading_icon/square_center" pivot="10.6,10.6" tweened="false"/>
+      <kf duration="1" ref="loading_icon/square_center" pivot="10.6,10.6" tweened="false"/>
+    </layer>
+  </movie>
+  <textureGroups>
+    <textureGroup scaleFactor="1">
+      <atlas file="XML/loading_icon/atlas0.png">
+        <texture name="loading_icon/square_center" rect="1,1,21,21" origin="10.6,10.6"/>
+        <texture name="loading_icon/loading_orb" rect="24,1,2,2" origin="1.4,1.4"/>
+      </atlas>
+    </textureGroup>
+  </textureGroups>
+</resources>

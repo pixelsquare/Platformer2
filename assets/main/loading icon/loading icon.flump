@@ -1,0 +1,30 @@
+{
+  "exports": [
+    {
+      "optimize": "Memory",
+      "quality": "best",
+      "format": "JSON",
+      "maxAtlasSize": 2048,
+      "additionalScaleFactors": [],
+      "textureBorder": 1,
+      "scale": 1,
+      "name": "JSON",
+      "description": "'JSON' (JSON, 100%)",
+      "scaleFactorsString": ""
+    },
+    {
+      "optimize": "Memory",
+      "quality": "best",
+      "format": "XML",
+      "maxAtlasSize": 2048,
+      "additionalScaleFactors": [],
+      "textureBorder": 1,
+      "scale": 1,
+      "name": "XML",
+      "description": "'XML' (XML, 100%)",
+      "scaleFactorsString": ""
+    }
+  ],
+  "exportDir": "",
+  "importDir": "flash"
+}

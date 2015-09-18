@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<TextureAtlas imagePath="dash.png">
+	<!-- Created with Adobe Flash CS6 version 12.0.0.481 -->
+	<!-- http://www.adobe.com/products/flash.html -->
+	<SubTexture name="run" x="1" y="1" width="41" height="35" frameX="-1" frameY="0" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="run" x="1" y="1" width="41" height="35" frameX="-1" frameY="0" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="run" x="1" y="1" width="41" height="35" frameX="-1" frameY="-2" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="run" x="43" y="1" width="42" height="36" frameX="0" frameY="-2" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="run" x="43" y="1" width="42" height="36" frameX="0" frameY="-2" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="run" x="86" y="1" width="41" height="35" frameX="-1" frameY="-2" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="run" x="86" y="1" width="41" height="35" frameX="-1" frameY="-2" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="run" x="1" y="38" width="41" height="36" frameX="-1" frameY="0" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="run" x="1" y="38" width="41" height="36" frameX="-1" frameY="0" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="run" x="1" y="38" width="41" height="36" frameX="-1" frameY="-2" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="run" x="43" y="38" width="42" height="35" frameX="0" frameY="-2" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="run" x="43" y="38" width="42" height="35" frameX="0" frameY="-2" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="run" x="86" y="38" width="41" height="35" frameX="-1" frameY="-2" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="run" x="86" y="38" width="41" height="35" frameX="-1" frameY="-2" frameWidth="42" frameHeight="38"/>
+	<SubTexture name="stand" x="1" y="38" width="41" height="36" frameX="0" frameY="0" frameWidth="42" frameHeight="38"/>
+</TextureAtlas>
