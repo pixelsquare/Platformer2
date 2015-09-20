@@ -2,6 +2,7 @@ package platformer.screen.main;
 
 import flambe.asset.AssetPack;
 import flambe.display.ImageSprite;
+import flambe.display.Texture;
 import flambe.Entity;
 import flambe.input.Key;
 import flambe.input.KeyboardEvent;
@@ -11,13 +12,12 @@ import flambe.script.Script;
 import flambe.script.Sequence;
 import flambe.subsystem.StorageSystem;
 import flambe.System;
-import flambe.display.Texture;
 
 import platformer.core.SceneManager;
+import platformer.main.PlatformMain;
 import platformer.name.AssetName;
 import platformer.name.ScreenName;
 import platformer.screen.GameScreen;
-import platformer.main.PlatformMain;
 
 /**
  * ...

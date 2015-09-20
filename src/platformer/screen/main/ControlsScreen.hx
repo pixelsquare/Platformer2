@@ -13,10 +13,10 @@ import flambe.subsystem.StorageSystem;
 import flambe.System;
 
 import platformer.core.SceneManager;
+import platformer.main.PlatformMain;
 import platformer.name.AssetName;
 import platformer.name.ScreenName;
 import platformer.screen.GameScreen;
-import platformer.main.PlatformMain;
 
 /**
  * ...

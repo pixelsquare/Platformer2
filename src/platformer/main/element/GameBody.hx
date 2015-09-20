@@ -1,19 +1,19 @@
 package platformer.main.element;
 
+import flambe.math.FMath;
+
 import nape.callbacks.CbType;
-import nape.dynamics.InteractionGroup;
+import nape.dynamics.InteractionFilter;
 import nape.geom.Vec2;
 import nape.phys.Body;
 import nape.phys.BodyType;
-import nape.shape.Polygon;
 import nape.phys.Material;
+import nape.shape.Polygon;
 import nape.space.Space;
-import nape.dynamics.InteractionFilter;
+import nape.shape.Shape;
+import nape.geom.AABB;
 
-import flambe.math.FMath;
-import platformer.main.utils.GameConstants;
 import platformer.pxlSq.Utils;
-import nape.util.Debug;
 
 /**
  * ...
@@ -22,39 +22,30 @@ import nape.util.Debug;
 class GameBody extends GameElement
 {
 	public var gameBody(default, null): Body;
-	public var gameBodyLayer(default, null): Int;
+	public var gameBodyShape(default, null): Polygon;
+	
+	private var gameBodyMaterial: Material;
 	
 	public function new() {
 		super();
-		this.gameBodyLayer = 0;
+		//this.gameBodyMaterial = new Material(0.1, 0.02, 0.01, 0.05, 0.0001);
+		//this.gameBodyMaterial = new Material(0, 0, 0, 1, 0.001);
+		this.gameBodyMaterial = new Material();
 	}
 	
-	public function InitBody(width: Float, height: Float, space: Space): Void {		
-		gameBody = new Body(Vec2.weak(x._, y._));
-		gameBody.shapes.add(new Polygon(
-			Polygon.box(width, height), 
-			new Material(0.03, 0.02, 0.1, 0.05)
-		));
+	public function InitBody(bodyType: BodyType, space: Space, verts: Array<Vec2>): Void {			
+		gameBody = new Body(bodyType, Vec2.weak(x._, y._));
+		gameBodyShape = new Polygon(verts, gameBodyMaterial);
+		gameBody.shapes.add(gameBodyShape);
 		
 		gameBody.space = space;
 		gameBody.allowRotation = false;
 	}
 	
-	public function SetBodyFilter(bodyFilter: InteractionFilter): Void {
-		gameBodyLayer = bodyFilter.collisionGroup;
-		gameBody.setShapeFilters(bodyFilter);
-	}
-	
-	public function SetBodyMaterial(material: Material): Void {
-		gameBody.setShapeMaterials(material);
-	}
-	
-	public function SetBodyCbType(cbtype: CbType): Void {
-		gameBody.cbTypes.add(cbtype);
-	}
-	
-	public function SetBodyType(bodyType: BodyType): Void {
-		gameBody.type = bodyType;
+	public function SetCollisionMask(mask: Int): Void {
+		for (shape in gameBody.shapes) {
+			shape.filter.collisionMask = mask;
+		}
 	}
 	
 	override public function onUpdate(dt:Float) {

@@ -6,14 +6,11 @@ import flambe.display.Sprite;
 import flambe.swf.Library;
 import flambe.swf.MoviePlayer;
 import flambe.util.Signal1;
-import platformer.main.element.GameBody;
 
-import platformer.main.element.GameElement;
+import platformer.main.element.GameBody;
+import platformer.main.tile.PlatformTile;
 import platformer.main.utils.GameConstants;
 import platformer.main.utils.IGrid;
-import platformer.main.tile.PlatformTile;
-
-import platformer.pxlSq.Utils;
 
 /**
  * ...

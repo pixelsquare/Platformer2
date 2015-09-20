@@ -46,10 +46,7 @@ class GameScreen extends DataManager
 		var screenTitleFont: Font = new Font(gameAsset, FontName.FONT_VANADINE_32);
 		screenTitleText = new TextSprite(screenTitleFont, GetScreenName());
 		screenTitleText.centerAnchor();
-		screenTitleText.setXY(
-			System.stage.width / 2,
-			System.stage.height / 2
-		);
+		screenTitleText.setXY(System.stage.width / 2, System.stage.height / 2);
 		AddToEntity(screenTitleText);
 		
 		return screenEntity;

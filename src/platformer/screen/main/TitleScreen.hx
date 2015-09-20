@@ -71,7 +71,6 @@ class TitleScreen extends GameScreen
 					Utils.ConsoleLog("Streaming Asset loaded!");
 					SceneManager.ShowMainScreen();
 					MainScreen.sharedInstance.CreatePlatformMain(streamingAsset);
-					//SceneManager.sharedInstance.gameMainScreen.CreatePlatformMain(streamingAsset);
 				});
 
 				SceneManager.ShowScreen(new PreloadScreen(gameAsset, promise));

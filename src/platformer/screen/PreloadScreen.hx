@@ -7,8 +7,8 @@ import flambe.display.PatternSprite;
 import flambe.display.TextSprite;
 import flambe.Entity;
 import flambe.System;
-import flambe.util.Promise;
 
+import flambe.util.Promise;
 import platformer.name.AssetName;
 import platformer.name.FontName;
 import platformer.name.ScreenName;
@@ -23,10 +23,10 @@ class PreloadScreen extends GameScreen
 	private var loadingText: TextSprite;
 	
 	private static inline var PROGRESS_BAR_PADDING: Int = 50;
+	private static inline var PROGRESS_TEXT: String = "LOADING | ";
 	
 	public function new(preloadPack: AssetPack, promise: Promise<Dynamic>) {
 		super(preloadPack, null);
-		
 		this.promise = promise;
 	}
 	
@@ -36,7 +36,7 @@ class PreloadScreen extends GameScreen
 		HideTitleText();
 		
 		var loadingFont: Font = new Font(gameAsset, FontName.FONT_VANADINE_32);
-		loadingText = new TextSprite(loadingFont, "LOADING | 0%");
+		loadingText = new TextSprite(loadingFont, PROGRESS_TEXT + "0%");
 		loadingText.centerAnchor();
 		loadingText.setXY(System.stage.width / 2, System.stage.height * 0.45);
 		AddToEntity(loadingText);
@@ -70,7 +70,7 @@ class PreloadScreen extends GameScreen
 	}
 	
 	public function SetLoadingTextDirty(): Void {
-		loadingText.text = "LOADING | " + Std.int(promise.progress / promise.total * 100) + "%";
+		loadingText.text = PROGRESS_TEXT + Std.int(promise.progress / promise.total * 100) + "%";
 		loadingText.centerAnchor();
 		loadingText.setXY(System.stage.width / 2, System.stage.height * 0.45);
 	}

@@ -19,7 +19,7 @@
   </classpaths>
   <!-- Build options -->
   <build>
-    <option directives="flash-strict&#xA;NAPE_RELEASE_BUILD" />
+    <option directives="flash-strict&#xA;html&#xA;NAPE_RELEASE_BUILD" />
     <option flashStrict="True" />
     <option noInlineOnDebug="False" />
     <option mainClass="platformer.Main" />

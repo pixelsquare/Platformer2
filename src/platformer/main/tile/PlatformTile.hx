@@ -59,7 +59,7 @@ class PlatformTile extends GameBody implements IGrid
 		this.tileTexture = null;
 		this.tileType = TileType.NONE;
 		this.tileDataType = TileDataType.NONE;
-		this.gameBodyLayer = 0;
+		//this.gameBodyLayer = 0;
 	}
 	
 	override public function Init(): Void {

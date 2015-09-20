@@ -12,11 +12,9 @@ import nape.phys.Body;
 import platformer.main.hero.utils.HeroDirection;
 import platformer.main.PlatformMain;
 import platformer.main.tile.PlatformTile;
-import platformer.main.utils.GameConstants;
 import platformer.main.tile.utils.TileDataType;
 import platformer.main.tile.utils.TileType;
-
-import platformer.pxlSq.Utils;
+import platformer.main.utils.GameConstants;
 
 /**
  * ...
@@ -30,12 +28,11 @@ class PlatformHeroControl extends Component
 	
 	private var platformHero: PlatformHero;
 	private var platformMain: PlatformMain;
-	private var heroBody: Body;
 	private var tileGrid: Array<Array<PlatformTile>>;
 	
 	private var controlDisposer: Disposer;
 	
-	private static inline var JUMP_FORCE: Float = -20;
+	private static inline var JUMP_FORCE: Float = -35;
 	
 	public function new () { 
 		this.heroDirection = HeroDirection.NONE;
@@ -67,13 +64,15 @@ class PlatformHeroControl extends Component
 		
 		platformHero = owner.get(PlatformHero);
 		platformMain = platformHero.parent.get(PlatformMain);
-		heroBody = platformHero.gameBody;
 		
 		controlDisposer = owner.get(Disposer);
 		if (controlDisposer == null) {
 			owner.add(controlDisposer = new Disposer());
 		}
-		
+	}
+	
+	override public function onStart() {
+		super.onStart();
 		var curTile: PlatformTile = null;
 		controlDisposer.add(platformHero.onTileChanged.connect(function(tile: PlatformTile) {
 			curTile = tile;
@@ -93,7 +92,7 @@ class PlatformHeroControl extends Component
 				if (!isHeroGrounded)
 					return;
 				
-				heroBody.applyImpulse(Vec2.weak(0, JUMP_FORCE));
+				platformHero.gameBody.applyImpulse(Vec2.weak(0, JUMP_FORCE));
 			}
 		}));
 	}
@@ -110,21 +109,20 @@ class PlatformHeroControl extends Component
 		heroDirection = HeroDirection.NONE;
 		tileGrid = platformMain.tileGrid;
 			
-		heroBody = platformHero.gameBody;
-		heroBody.velocity.x = 0;
+		platformHero.gameBody.velocity.x = 0;
 		
 		if (System.keyboard.isDown(Key.D) || System.keyboard.isDown(Key.Right)) {		
 			if (heroDirection == HeroDirection.LEFT) {
-				heroBody.velocity.x = 0;
+				platformHero.gameBody.velocity.x = 0;
 				isHeroRunning = false;
 			}
 			else {
 				if (platformHero.x._ < GameConstants.GRID_ROWS * GameConstants.TILE_WIDTH - (GameConstants.TILE_WIDTH / 2)) {
-					heroBody.velocity.x = 100;
+					platformHero.gameBody.velocity.x = 100;
 					isHeroRunning = true;
 				}
 				else {
-					heroBody.velocity.x = 0;
+					platformHero.gameBody.velocity.x = 0;
 					isHeroRunning = false;
 				}
 			}
@@ -134,16 +132,16 @@ class PlatformHeroControl extends Component
 		
 		if (System.keyboard.isDown(Key.A) || System.keyboard.isDown(Key.Left)) {
 			if (heroDirection == HeroDirection.RIGHT) {
-				heroBody.velocity.x = 0;
+				platformHero.gameBody.velocity.x = 0;
 				isHeroRunning = false;
 			}
 			else {
 				if (platformHero.x._ > (GameConstants.TILE_WIDTH / 2)) {
-					heroBody.velocity.x = -100;
+					platformHero.gameBody.velocity.x = -100;
 					isHeroRunning = true;
 				}
 				else {
-					heroBody.velocity.x = 0;
+					platformHero.gameBody.velocity.x = 0;
 					isHeroRunning = false;
 				}
 			}
@@ -154,9 +152,8 @@ class PlatformHeroControl extends Component
 		var idx: Int = Math.floor(platformHero.x._ / GameConstants.TILE_WIDTH);
 		var idy: Int = Math.floor((platformHero.y._ - 20) / GameConstants.TILE_HEIGHT);
 		var postBottomTile: PlatformTile = tileGrid[idx][idy + 1];
-		
-		if (heroBody.velocity.y > -5 && heroBody.velocity.y < 5) {
-			if(heroBody.arbiters.length > 0 && postBottomTile.gameBodyLayer != 0) {
+		if (platformHero.gameBody.velocity.y > -5 && platformHero.gameBody.velocity.y < 5) {
+			if(platformHero.gameBody.arbiters.length > 0 && postBottomTile.gameBodyShape.filter.collisionGroup != 0) {
 				isHeroGrounded = true;
 			}
 		}
@@ -164,11 +161,14 @@ class PlatformHeroControl extends Component
 		idx = platformHero.idx;
 		idy = platformHero.idy;
 		var bottomTile: PlatformTile = tileGrid[idx][idy + 1];
-		//if(!isHeroGrounded && bottomTile != null) {
-			if (heroBody.velocity.y >= 0 && bottomTile.gameBodyLayer != 0) {
-				platformHero.gameBody.shapes.at(0).filter.collisionMask = bottomTile.gameBodyLayer;
-			}
-		//}
+		if (platformHero.gameBody.velocity.y >= 0 && bottomTile.gameBodyShape.filter.collisionGroup != 0) {
+			platformHero.SetCollisionMask(bottomTile.gameBodyShape.filter.collisionGroup);
+			//platformHero.gameBodyShape.filter.collisionMask = bottomTile.gameBodyShape.filter.collisionGroup;
+		}
+		
+		if (isHeroGrounded) {
+			platformHero.gameBody.velocity.y = 0;
+		}
 		
 		platformHero.SetAnimationDirty(isHeroRunning);
 	}

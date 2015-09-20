@@ -20,34 +20,31 @@ import flambe.script.Script;
 import flambe.script.Sequence;
 import flambe.sound.Playback;
 import flambe.System;
+import flambe.math.FMath;
 import haxe.Json;
+
 import nape.callbacks.InteractionCallback;
 import nape.callbacks.InteractionListener;
-import nape.phys.Interactor;
-import nape.phys.Material;
-
-import nape.callbacks.CbEvent;
+import nape.shape.Polygon;
 import nape.callbacks.CbType;
 import nape.dynamics.InteractionFilter;
 import nape.geom.Vec2;
 import nape.phys.BodyType;
 import nape.space.Space;
-import nape.callbacks.PreListener;
+import nape.callbacks.CbEvent;
 import nape.callbacks.InteractionType;
-import nape.callbacks.PreCallback;
-import nape.callbacks.PreFlag;
-
-import platformer.main.hero.utils.HeroDirection;
+import nape.phys.Material;
+import nape.shape.Circle;
 
 import platformer.core.DataManager;
 import platformer.core.SceneManager;
 import platformer.main.format.RoomFormat;
 import platformer.main.hero.PlatformHero;
 import platformer.main.hero.PlatformHeroControl;
+import platformer.main.hero.utils.HeroDirection;
 import platformer.main.tile.PlatformTile;
 import platformer.main.tile.utils.TileDataType;
 import platformer.main.tile.utils.TileType;
-import platformer.main.utils.CollisionGroup;
 import platformer.main.utils.GameConstants;
 import platformer.name.AssetName;
 import platformer.name.FontName;
@@ -89,9 +86,17 @@ class PlatformMain extends Component
 	private var gameAsset: AssetPack;
 	private var roomDataJson: RoomFormat;
 	
-	private var fpsEntity: Entity;
 	private var bgm: Playback;
+	private var bgmToggle: Bool;
+	private var audioText: TextSprite;
+	
+	private var fpsEntity: Entity;
 	private var platformDisposer: Disposer;
+	private var heroSignalDisposer: Disposer;
+	
+	//#if flash
+	//private var debug: nape.util.ShapeDebug;
+	//#end
 	
 	public static var sharedInstance: PlatformMain;
 	
@@ -129,6 +134,14 @@ class PlatformMain extends Component
 		this.doorBodyCbType = new CbType();
 		this.blockBodyCbType = new CbType();
 		this.obstacleBodyCbType = new CbType();
+		
+		this.bgmToggle = true;
+		this.heroSignalDisposer = new Disposer();
+		
+		//#if flash
+		//debug = new nape.util.ShapeDebug(System.stage.width, System.stage.height);
+		//flash.Lib.current.stage.addChild(debug.display);
+		//#end
 		
 		sharedInstance = this;
 		
@@ -183,6 +196,7 @@ class PlatformMain extends Component
 		DrawAllTiles();
 		
 		CreatePlatformHero();
+		ShowAudioIndicator();
 		ShowScreenCurtain();
 		ShowFPS();
 	}
@@ -215,14 +229,7 @@ class PlatformMain extends Component
 	}
 	
 	public function CreatePlatformHero(): Void {
-		var doorIn: PlatformTile = null;
-		for (tile in allTiles) {
-			if (tile.tileType == TileType.DOOR_IN) {
-				doorIn = tile;
-				break;
-			}
-		}
-		
+		var doorIn: PlatformTile = GetTileOfType(TileType.DOOR_IN);
 		if (doorIn == null) {
 			Utils.ConsoleLog("Door in not specified!");
 			return;
@@ -233,11 +240,12 @@ class PlatformMain extends Component
 		platformHero.SetParent(owner);
 		platformHero.SetXY(doorIn.x._, doorIn.y._);
 		platformHero.SetSize(GameConstants.TILE_WIDTH, GameConstants.TILE_HEIGHT);
-		platformHero.InitBody(GameConstants.TILE_WIDTH - 5, GameConstants.TILE_HEIGHT - 5, gameSpace);
-		platformHero.SetBodyCbType(heroBodyCbType);
-		platformHero.SetBodyFilter(new InteractionFilter(CollisionGroup.HERO_GROUP));
-		platformHero.SetBodyType(BodyType.DYNAMIC);
-		//platformHero.SetBodyMaterial(new Material(0.03, 0.02, 0.1, 0.05));
+		
+		platformHero.InitBody(BodyType.DYNAMIC, gameSpace, [Vec2.weak( -17.5, -17.5), Vec2.weak(17.5, -17.5), Vec2.weak(17.5, 17.5), Vec2.weak( -17.5, 17.5)]);
+		platformHero.gameBody.shapes.add(new Circle(18));
+		platformHero.gameBody.setShapeMaterials(new Material(0.1, 0.0, 0.0, 0.05, 0.0001));
+		platformHero.gameBody.cbTypes.add(heroBodyCbType);
+
 		heroEntity.add(platformHero);
 		
 		platformHeroControl = new PlatformHeroControl();
@@ -248,13 +256,7 @@ class PlatformMain extends Component
 		// Set hero's initial direction
 		platformHeroControl.SetHeroDirection((roomDataJson.Hero_Direction == 1) ? HeroDirection.RIGHT : HeroDirection.LEFT);
 		
-		//gameSpace.listeners.add(new InteractionListener(CbEvent.BEGIN, InteractionType.COLLISION, heroBodyCbType, obstacleBodyCbType, function(cb: InteractionCallback) {
-			//Utils.ConsoleLog("LOSE!");
-			//
-			//PlayHeroDeathAnim();
-		//}));
-		
-		platformDisposer.add(platformHero.onTileChanged.connect(function(tile: PlatformTile) {
+		heroSignalDisposer.add(platformHero.onTileChanged.connect(function(tile: PlatformTile) {
 			if (isGameOver)
 				return;
 			
@@ -262,10 +264,8 @@ class PlatformMain extends Component
 				Utils.ConsoleLog("EXIT!");
 			}
 			
-			if (tile.idy == (GameConstants.GRID_COLS - 1) || tile.tileDataType == TileDataType.OBSTACLE) {
-				Utils.ConsoleLog("LOSE!");
-				Utils.ConsoleLog("Tile Info: " + tile.tileDataType + " " + tile.GridIDToString());
-				
+			if (tile.idy >= (GameConstants.GRID_COLS - 1)) {
+				Utils.ConsoleLog("LOSE! Out of bounds!");				
 				PlayHeroDeathAnim();
 			}
 		}));
@@ -286,8 +286,9 @@ class PlatformMain extends Component
 					jj * tile.GetNaturalHeight() + (GameConstants.TILE_HEIGHT / 2)
 				);
 				
-				tile.InitBody(GameConstants.TILE_WIDTH, GameConstants.TILE_HEIGHT, gameSpace);
-				tile.SetBodyType(BodyType.STATIC);
+				tile.InitBody(BodyType.STATIC, gameSpace, [Vec2.weak(-20, -20), Vec2.weak(20, -20), Vec2.weak(20, 20), Vec2.weak(-20, 20)]);
+				tile.gameBodyShape.filter.collisionMask = 0;
+
 				tileArray.push(tile);
 			}
 			tileGrid.push(tileArray);
@@ -340,8 +341,10 @@ class PlatformMain extends Component
 				blockTile.SetTileTexture(blockTexture);
 				blockTile.SetTileType(blockTileType);
 				blockTile.SetTileDataType(TileDataType.BLOCK);
-				blockTile.SetBodyCbType(blockBodyCbType);
-				blockTile.SetBodyFilter(new InteractionFilter(CollisionGroup.BLOCK_GROUP));
+				
+				blockTile.gameBody.cbTypes.add(blockBodyCbType);
+				blockTile.gameBodyShape.filter.collisionMask = -1;
+				
 				allTiles.push(blockTile);
 			}
 		}
@@ -366,8 +369,15 @@ class PlatformMain extends Component
 				obstacleTile.SetTileTexture(obstacleTexture);
 				obstacleTile.SetTileType(obstacleTileType);
 				obstacleTile.SetTileDataType(TileDataType.OBSTACLE);
-				obstacleTile.SetBodyCbType(obstacleBodyCbType);
-				obstacleTile.SetBodyFilter(new InteractionFilter(CollisionGroup.OBSTACLE_GROUP));
+				
+				if (curRoomIndx == 4) {
+					Utils.ConsoleLog(ii + " " + jj + " " + obstacleDataVal);
+				}
+				
+				obstacleTile.InitBody(BodyType.STATIC, gameSpace, GetObstacleShape(obstacleDataVal));
+				obstacleTile.gameBody.cbTypes.add(obstacleBodyCbType);
+				
+				obstacleTile.gameBodyShape.sensorEnabled = true;
 				allTiles.push(obstacleTile);
 			}
 		}
@@ -392,8 +402,9 @@ class PlatformMain extends Component
 				doorTile.SetTileTexture(doorTexture);
 				doorTile.SetTileType(doorTileType);
 				doorTile.SetTileDataType(TileDataType.DOOR);
-				doorTile.SetBodyCbType(doorBodyCbType);
-				doorTile.SetBodyFilter(new InteractionFilter(CollisionGroup.DOOR_GROUP));
+				
+				doorTile.gameBody.cbTypes.add(doorBodyCbType);
+				
 				allTiles.push(doorTile);
 			}
 		}
@@ -410,8 +421,7 @@ class PlatformMain extends Component
 				var layerVal: Int = layerData[jj][ii];
 				var blockTile: PlatformTile = tileGrid[ii][jj];
 				if (blockTile != null) {
-					//blockTile.gameBody.shapes.at(0).filter.collisionGroup = layerVal;
-					blockTile.SetBodyFilter(new InteractionFilter(layerVal));
+					blockTile.gameBodyShape.filter.collisionGroup = layerVal;
 				}
 			}
 		}
@@ -432,18 +442,22 @@ class PlatformMain extends Component
 	public function ClearStage(): Void {
 		Utils.ConsoleLog("Cleaning room tiles [Count: " + allTiles.length + "]");
 		
-		for (tile in allTiles) {
-			tile.dispose();
-		}
-		
-		allTiles = new Array<PlatformTile>();
 		roomDataJson = null;
+		allTiles = new Array<PlatformTile>();
+		
+		owner.removeChild(tilesEntity);
+		tilesEntity.dispose();
 		
 		owner.removeChild(heroEntity);
 		heroEntity.dispose();
 		
-		platformHero = null;
-		platformHeroControl = null;
+		platformHero.dispose();
+		platformHeroControl.dispose();
+		heroSignalDisposer.dispose();
+		
+		//#if flash
+		//debug.clear();
+		//#end
 	}
 	
 	// Resetting all information stored in tile grid
@@ -454,6 +468,19 @@ class PlatformMain extends Component
 				tileGrid[ii][jj].Reset();
 			}
 		}
+	}
+	
+	public function GetTileOfType(tileType: TileType): PlatformTile {
+		var result: PlatformTile = null;
+		
+		for (tile in allTiles) {
+			if (tile.tileType != tileType)
+				continue;
+			
+			result = tile;
+		}
+		
+		return result;
 	}
 	
 	public function GetTileType(indx: Int): TileType {
@@ -512,6 +539,19 @@ class PlatformMain extends Component
 		return obstacleType;
 	}
 	
+	// Creates a triangle-shaped polygon to fit spike's shape
+	public function GetObstacleShape(indx: Int): Array<Vec2> {
+		var result = [];
+		if (indx == 1) {
+			result = [Vec2.weak( -1, -20), Vec2.weak(1, -20), Vec2.weak(15, 20), Vec2.weak( -15, 20)];
+		}
+		else if (indx == 2) {
+			result = [Vec2.weak( -15, -20), Vec2.weak(15, -20), Vec2.weak(1, 20), Vec2.weak( -1, 20)];
+		}
+		
+		return result;
+	}
+	
 	public function PlayHeroDeathAnim(): Void {
 		isGameOver = true;
 		platformHero.DestroyBody();
@@ -540,7 +580,9 @@ class PlatformMain extends Component
 	public function ShowScreenCurtain(): Void {		
 		var screenCurtain: FillSprite = new FillSprite(0x000000, System.stage.width, System.stage.height);
 		owner.addChild(new Entity().add(screenCurtain));
+		
 		isGameStart = false;
+		audioText.alpha._ = 0;
 		
 		var curtainScript: Script = new Script();
 		curtainScript.run(new Sequence([
@@ -549,6 +591,7 @@ class PlatformMain extends Component
 				owner.removeChild(new Entity().add(screenCurtain));
 				screenCurtain.dispose();
 				owner.removeChild(new Entity().add(curtainScript));
+				audioText.alpha._ = 1;
 				
 				if (curRoomIndx == 1) {
 					SceneManager.ShowControlsScreen();
@@ -573,6 +616,22 @@ class PlatformMain extends Component
 		owner.addChild(fpsEntity);
 	}
 	
+	public function CreateBGM(): Void {
+		bgm = gameAsset.getSound(BGM_PATH + BGM_NAME).loop(BGM_VOLUME);
+		bgm.paused = bgmToggle;
+		platformDisposer.add(bgm);
+	}
+	
+	public function ShowAudioIndicator(): Void {
+		if (audioText != null) {
+			owner.removeChild(new Entity().add(audioText));
+		}
+		
+		audioText = new TextSprite(new Font(gameAsset, FontName.FONT_ARIAL_18), (!bgmToggle) ? "[M]usic: On" : "[M]usic: Off");
+		audioText.setXY(System.stage.width * 0.9, System.stage.height * 0.975);
+		owner.addChild(new Entity().add(audioText));
+	}
+	
 	override public function onAdded() {
 		super.onAdded();
 		
@@ -583,16 +642,26 @@ class PlatformMain extends Component
 		
 		CreateRoomTiles();
 		LoadRoom(curRoomIndx);
+		CreateBGM();
 		
-		bgm = gameAsset.getSound(BGM_PATH + BGM_NAME).loop(BGM_VOLUME);
-		platformDisposer.add(bgm);
+		gameSpace.listeners.add(new InteractionListener(CbEvent.BEGIN, InteractionType.SENSOR, heroBodyCbType, obstacleBodyCbType, function(cb: InteractionCallback) {
+			Utils.ConsoleLog("LOSE! Hit to obstacle!");				
+			PlayHeroDeathAnim();
+		}));
 	}
 	
 	override public function onStart() {
 		super.onStart();
 		
-		#if debug
+		
 		platformDisposer.add(System.keyboard.down.connect(function(event: KeyboardEvent) {
+			if (event.key == Key.M) {
+				bgmToggle = !bgmToggle;
+				bgm.paused = bgmToggle;
+				audioText.text = (!bgmToggle) ? "[M]usic: On" : "[M]usic: Off";
+			}
+			
+			//#if debug
 			if (event.key == Key.Number1) {
 				LoadRoom(1);
 			}
@@ -614,16 +683,25 @@ class PlatformMain extends Component
 			if (event.key == Key.F2) {
 				LoadNextRoom();
 			}
-			if (event.key == Key.F3) {
-				ResetRoomTiles();
-				ClearStage();
-			}
+			//if (event.key == Key.F3) {
+				//ResetRoomTiles();
+				//ClearStage();
+			//}
+			//#end
 		}));
-		#end
+		
 	}
 	
 	override public function onUpdate(dt:Float) {
 		super.onUpdate(dt);
 		gameSpace.step(dt);
+		
+		//#if flash
+		//if(!isGameOver) {
+			//debug.clear();
+			//debug.draw(gameSpace);
+			//debug.flush();
+		//}
+		//#end
 	}
 }

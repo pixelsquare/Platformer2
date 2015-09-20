@@ -1,7 +1,5 @@
 package platformer.pxlSq;
 
-import flambe.Entity;
-
 #if flash
 import flash.external.ExternalInterface;
 #end

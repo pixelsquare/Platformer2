@@ -11,7 +11,7 @@ developer:
 id: com.pixelsquare.platformer2
 
 # The game's version string.
-version: 1.0.0
+version: 2.0.0
 
 # The main class name.
 main: platformer.Main
