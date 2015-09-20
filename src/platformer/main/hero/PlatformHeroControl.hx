@@ -35,12 +35,17 @@ class PlatformHeroControl extends Component
 	
 	private var controlDisposer: Disposer;
 	
-	private static inline var JUMP_FORCE: Float = -290;
+	private static inline var JUMP_FORCE: Float = -20;
 	
 	public function new () { 
 		this.heroDirection = HeroDirection.NONE;
 		this.isHeroRunning = false;
 		this.isHeroGrounded = false;
+	}
+	
+	public function SetHeroDirection(direction: HeroDirection): Void {
+		heroDirection = direction;
+		SetHeroFacingDirty();
 	}
 	
 	public function SetHeroFacingDirty(): Void {

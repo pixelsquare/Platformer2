@@ -33,7 +33,7 @@ class GameBody extends GameElement
 		gameBody = new Body(Vec2.weak(x._, y._));
 		gameBody.shapes.add(new Polygon(
 			Polygon.box(width, height), 
-			new Material(0.01, 0.02, 0.1, 0.9)
+			new Material(0.03, 0.02, 0.1, 0.05)
 		));
 		
 		gameBody.space = space;

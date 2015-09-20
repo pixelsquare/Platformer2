@@ -18,6 +18,7 @@ import flambe.script.AnimateTo;
 import flambe.script.CallFunction;
 import flambe.script.Script;
 import flambe.script.Sequence;
+import flambe.sound.Playback;
 import flambe.System;
 import haxe.Json;
 import nape.callbacks.InteractionCallback;
@@ -35,6 +36,8 @@ import nape.callbacks.PreListener;
 import nape.callbacks.InteractionType;
 import nape.callbacks.PreCallback;
 import nape.callbacks.PreFlag;
+
+import platformer.main.hero.utils.HeroDirection;
 
 import platformer.core.DataManager;
 import platformer.core.SceneManager;
@@ -87,15 +90,20 @@ class PlatformMain extends Component
 	private var roomDataJson: RoomFormat;
 	
 	private var fpsEntity: Entity;
+	private var bgm: Playback;
 	private var platformDisposer: Disposer;
 	
 	public static var sharedInstance: PlatformMain;
+	
+	private static inline var BGM_PATH: String = "audio/bgm/";
+	private static inline var BGM_NAME: String = "Synthony";
+	private static inline var BGM_VOLUME: Float = 0.5;
 	
 	private static inline var ROOM_DATA_PATH: String = "roomdata/RoomData_";
 	private static inline var ROOM_DATA_EXT: String = ".json";
 	
 	private static inline var ROOM_MAX: Int = 5;
-	private static inline var GAME_GRAVITY: Float = 650;
+	private static inline var GAME_GRAVITY: Float = 1000;
 	
 	public function new(dataManager: DataManager, streamingAsset: AssetPack) {
 		this.dataManager = dataManager;
@@ -185,6 +193,7 @@ class PlatformMain extends Component
 		
 		if (curIndx > ROOM_MAX) {
 			Utils.ConsoleLog("WIN!");
+			OnGameEnd(true);
 			return;
 		}
 		
@@ -228,12 +237,16 @@ class PlatformMain extends Component
 		platformHero.SetBodyCbType(heroBodyCbType);
 		platformHero.SetBodyFilter(new InteractionFilter(CollisionGroup.HERO_GROUP));
 		platformHero.SetBodyType(BodyType.DYNAMIC);
+		//platformHero.SetBodyMaterial(new Material(0.03, 0.02, 0.1, 0.05));
 		heroEntity.add(platformHero);
 		
 		platformHeroControl = new PlatformHeroControl();
 		heroEntity.add(platformHeroControl);
 		
 		owner.addChild(heroEntity);
+		
+		// Set hero's initial direction
+		platformHeroControl.SetHeroDirection((roomDataJson.Hero_Direction == 1) ? HeroDirection.RIGHT : HeroDirection.LEFT);
 		
 		//gameSpace.listeners.add(new InteractionListener(CbEvent.BEGIN, InteractionType.COLLISION, heroBodyCbType, obstacleBodyCbType, function(cb: InteractionCallback) {
 			//Utils.ConsoleLog("LOSE!");
@@ -520,6 +533,7 @@ class PlatformMain extends Component
 	
 	public function OnGameEnd(win: Bool): Void {
 		didWin = win;
+		bgm.dispose();
 		SceneManager.ShowGameOverScreen();
 	}
 	
@@ -569,6 +583,9 @@ class PlatformMain extends Component
 		
 		CreateRoomTiles();
 		LoadRoom(curRoomIndx);
+		
+		bgm = gameAsset.getSound(BGM_PATH + BGM_NAME).loop(BGM_VOLUME);
+		platformDisposer.add(bgm);
 	}
 	
 	override public function onStart() {
